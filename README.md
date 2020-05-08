@@ -1,3 +1,60 @@
+
+[cookbookurl]: https://geek-cookbook.funkypenguin.co.nz
+[kitchenurl]: https://discourse.kitchen.funkypenguin.co.nz
+[discordurl]: http://chat.funkypenguin.co.nz
+[patreonurl]: https://patreon.com/funkypenguin
+[blogurl]: https://www.funkypenguin.co.nz
+[hub]: https://hub.docker.com/r/funkypenguin/munin-node/
+
+[![geek-cookbook](https://raw.githubusercontent.com/funkypenguin/www.funkypenguin.co.nz/master/images/geek-kitchen-banner.png)][cookbookurl]
+
+ 
+# Contents
+
+1. [What is this?](#what-is-this)
+2. [How to use it?](#how-to-use-it)
+3. [Why it exists?](#why-it-exists)
+4. [Upstream README](#upstream-readme)
+
+ 
+# How to use it?
+
+Use helm to add the repo:
+
+```
+helm repo add funkypenguins-geek-cookbook-fission \
+  https://funkypenguins-geek-cookbook.github.io/fission/
+```
+
+Then simply install using helm:
+
+```
+helm upgrade --install --namespace fission fission \
+  funkypenguins-geek-cookbook-fission
+```
+
+<aside class="notice">
+srsly bro? Why such a long name? Because we've moved from a mono-repo for helm charts, to a repo per-chart. This simplifies PR dependencies, and make it easier to track only the charts you're interested
+in, by watching each repo
+</aside>
+
+
+
+
+# What is this?
+
+This is a fork of fission/fission, so that I can self-host helmv3-compatible charts
+
+# How to use it?
+
+Edit another repo on the funkypenguins-geek-cookbook organization, in the `.penguin` folder
+
+# Why it exists?
+
+Because geeks like automating things (no, we are not just lazy :slightly_smiling_face:)
+
+# Upstream README
+
 # Fission: Serverless Functions for Kubernetes
 
 [![Build Status](https://travis-ci.org/fission/fission.svg?branch=master)](https://travis-ci.org/fission/fission)
@@ -5,7 +62,7 @@
 
 [fission.io](http://fission.io) | [@fissionio](http://twitter.com/fissionio) | [Slack](https://join.slack.com/t/fissionio/shared_invite/enQtOTI3NjgyMjE5NzE3LTllODJiODBmYTBiYWUwMWQxZWRhNDhiZDMyN2EyNjAzMTFiYjE2Nzc1NzE0MTU4ZTg2MzVjMDQ1NWY3MGJhZmE)
 
-<img src="https://docs.fission.io/images/logo.png" width="300">
+&lt;img src=&#34;https://docs.fission.io/images/logo.png&#34; width=&#34;300&#34;&gt;
 
 Fission is a fast serverless framework for Kubernetes with a focus on
 developer productivity and high performance.
@@ -21,22 +78,22 @@ PHP, Bash, and any Linux executable, with more languages coming soon.
 
 # Performance: 100msec cold start
 
-Fission maintains a pool of "warm" containers that each contain a
+Fission maintains a pool of &#34;warm&#34; containers that each contain a
 small dynamic loader.  When a function is first called,
-i.e. "cold-started", a running container is chosen and the function is
+i.e. &#34;cold-started&#34;, a running container is chosen and the function is
 loaded.  This pool is what makes Fission fast: cold-start latencies
 are typically about 100msec.
 
 # Kubernetes is the right place for Serverless
 
-We're built on Kubernetes because we think any non-trivial app will
+We&#39;re built on Kubernetes because we think any non-trivial app will
 use a combination of serverless functions and more conventional
 microservices, and Kubernetes is a great framework to bring these
 together seamlessly.
 
 Building on Kubernetes also means that anything you do for operations
-on your Kubernetes cluster &mdash; such as monitoring or log
-aggregation &mdash; also helps with ops on your Fission deployment.
+on your Kubernetes cluster &amp;mdash; such as monitoring or log
+aggregation &amp;mdash; also helps with ops on your Fission deployment.
 
 # Getting started and documentation
 
@@ -56,8 +113,8 @@ You can learn more about Fission and get started from [Fission Docs](https://doc
   # Add the stock NodeJS env to your Fission deployment
   $ fission env create --name nodejs --image fission/node-env
 
-  # A javascript one-liner that prints "hello world"
-  $ curl https://raw.githubusercontent.com/fission/fission/master/examples/nodejs/hello.js > hello.js
+  # A javascript one-liner that prints &#34;hello world&#34;
+  $ curl https://raw.githubusercontent.com/fission/fission/master/examples/nodejs/hello.js &gt; hello.js
 
   # Upload your function code to fission
   $ fission function create --name hello --env nodejs --code hello.js
@@ -81,7 +138,7 @@ Reach us on [slack](https://join.slack.com/t/fissionio/shared_invite/enQtOTI3Njg
 
 ## Community Meeting 
 
-A regular community meeting takes place every other Thursday at 09:00 AM PT (Pacific Time). [Convert to your local timezone](http://www.thetimezoneconverter.com/?t=09:00&tz=PT%20%28Pacific%20Time%29).
+A regular community meeting takes place every other Thursday at 09:00 AM PT (Pacific Time). [Convert to your local timezone](http://www.thetimezoneconverter.com/?t=09:00&amp;tz=PT%20%28Pacific%20Time%29).
 
 Meeting Link: https://zoom.us/j/413921817 
 
@@ -96,14 +153,16 @@ Builds from the master branch can have functionality changed and even removed at
 and without prior notice.
 
 # Sponsors
-The following companies, organizations, and individuals support Fission's ongoing maintenance and development.
+The following companies, organizations, and individuals support Fission&#39;s ongoing maintenance and development.
 Become a sponsor to get your logo on our README on Github with a link to your site.
 
-<p>
-    <a href="https://infracloud.io/"><img src="https://fission.io/sponsors/infracloud.png" alt="InfraCloud" height="70"></a>
-    <a href="https://srcmesh.com/"><img src="https://fission.io/sponsors/srcmesh.png" alt="Srcmesh" height="70"></a>
-</p>
+&lt;p&gt;
+    &lt;a href=&#34;https://infracloud.io/&#34;&gt;&lt;img src=&#34;https://fission.io/sponsors/infracloud.png&#34; alt=&#34;InfraCloud&#34; height=&#34;70&#34;&gt;&lt;/a&gt;
+    &lt;a href=&#34;https://srcmesh.com/&#34;&gt;&lt;img src=&#34;https://fission.io/sponsors/srcmesh.png&#34; alt=&#34;Srcmesh&#34; height=&#34;70&#34;&gt;&lt;/a&gt;
+&lt;/p&gt;
 
 # Licensing
 
 Fission is under the Apache 2.0 license.
+
+
