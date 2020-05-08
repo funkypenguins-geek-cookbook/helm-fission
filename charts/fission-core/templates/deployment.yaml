@@ -23,6 +23,7 @@ metadata:
     {{- end }}
 {{- end }}
 
+{{- if .Values.createClusterResources }}
 ---
 apiVersion: rbac.authorization.k8s.io/v1
 kind: ClusterRole
@@ -55,6 +56,22 @@ rules:
   - list
 
 ---
+kind: ClusterRoleBinding
+apiVersion: rbac.authorization.k8s.io/v1
+metadata:
+  name: fission-crd
+subjects:
+- kind: ServiceAccount
+  name: fission-svc
+  namespace: {{ .Release.Namespace }}
+roleRef:
+  kind: ClusterRole
+  name: cluster-admin
+  apiGroup: rbac.authorization.k8s.io
+
+{{- end }}
+
+---
 apiVersion: v1
 kind: ServiceAccount
 metadata:
@@ -74,20 +91,6 @@ subjects:
 roleRef:
   kind: ClusterRole
   name: admin
-  apiGroup: rbac.authorization.k8s.io
-
----
-kind: ClusterRoleBinding
-apiVersion: rbac.authorization.k8s.io/v1
-metadata:
-  name: fission-crd
-subjects:
-- kind: ServiceAccount
-  name: fission-svc
-  namespace: {{ .Release.Namespace }}
-roleRef:
-  kind: ClusterRole
-  name: cluster-admin
   apiGroup: rbac.authorization.k8s.io
 
 ---
