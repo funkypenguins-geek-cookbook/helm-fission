@@ -43,6 +43,17 @@ functionNamespace: fission-function
 ## the release namespace)
 builderNamespace: fission-builder
 
+
+# In clusters with multiple fission instances, helm will complain about pre-existing resources
+# Set the following to false to avoid (re)creating any cluster-scoped resources.
+# It's then up to you to ensure that the necessary clusterresources are created'
+createClusterResources: true
+
+# Whether or not to create namespaces for builder/fetcher as part of the helm install
+# In some configurations, a service account may have privilegdes to deploy into a namespace, but not
+# to create additional namespaces (so the namespaces must be pre-prepared)
+createNamespace: true
+
 ## Enable istio integration
 enableIstio: false
 

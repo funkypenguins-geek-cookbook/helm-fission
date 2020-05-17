@@ -22,6 +22,7 @@ metadata:
     istio-injection: enabled
     {{- end }}
 {{- end }}
+{{- if .Values.createClusterResources }}
 ---
 apiVersion: rbac.authorization.k8s.io/v1
 kind: ClusterRole
@@ -52,7 +53,7 @@ rules:
   - get
   - watch
   - list
-
+{{- end }}
 ---
 apiVersion: v1
 kind: ServiceAccount
