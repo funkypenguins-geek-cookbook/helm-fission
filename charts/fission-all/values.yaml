@@ -267,6 +267,9 @@ heapster: false
 ## Enable InfluxDB
 influxdb: true
 
+## Enable fluentbit
+fluentbit: true
+
 ## Archive pruner is a garbage collector for archives on the fission storage service.
 ## This interval configures the frequency at which it runs inside the storagesvc pod.
 ## The value is in minutes.
