@@ -344,7 +344,7 @@ spec:
 {{- if .Values.extraCoreComponentPodConfig }}
 {{ toYaml .Values.extraCoreComponentPodConfig | indent 6 -}}
 {{- end }}
-
+{{- if .Values.influxdb }}
 ---
 apiVersion: v1
 kind: Service
@@ -398,6 +398,7 @@ spec:
               key: password
 {{- if .Values.extraCoreComponentPodConfig }}
 {{ toYaml .Values.extraCoreComponentPodConfig | indent 6 -}}
+{{- end }}
 {{- end }}
 
 {{- if .Values.heapster }}
