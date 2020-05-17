@@ -3,6 +3,29 @@ entries:
   fission-all:
   - apiVersion: v1
     appVersion: 1.8.0
+    created: "2020-05-17T09:38:58.589590552Z"
+    dependencies:
+    - condition: prometheus.enabled
+      name: prometheus
+      repository: https://kubernetes-charts.storage.googleapis.com
+      version: 9.3.1
+    description: Fission is a fast serverless framework for Kubernetes.
+    digest: 0c6db7ff2e32decd383b9baf82f4895a5f6c9f1d79d3c6fbdec4fed441918ae2
+    home: http://fission.io/
+    keywords:
+    - fission
+    - serverless
+    maintainers:
+    - email: soamvasani+1@gmail.com
+      name: Soam Vasani
+    - email: hello@tachingchen.com
+      name: Ta Ching Chen
+    name: fission-all
+    urls:
+    - https://github.com/geek-cookbook/helm-fission/releases/download/fission-all-1.8.1-pre2/fission-all-1.8.1-pre2.tgz
+    version: 1.8.1-pre2
+  - apiVersion: v1
+    appVersion: 1.8.0
     created: "2020-05-08T22:09:35.343564679Z"
     dependencies:
     - condition: prometheus.enabled
