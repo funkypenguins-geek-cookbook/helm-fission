@@ -279,6 +279,9 @@ fluentbit: true
 ## The value is in minutes.
 pruneInterval: 60
 
+# Allow user to disable pre-upgrade checks (in the event that something like Istio prevents any jobs from completing!)
+preUpgradeChecks: true
+
 ## Fission pre-install/pre-upgrade checks live in this image
 preUpgradeChecksImage: fission/pre-upgrade-checks
 
