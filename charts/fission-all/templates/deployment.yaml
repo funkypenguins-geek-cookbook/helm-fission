@@ -344,7 +344,7 @@ spec:
 {{- if .Values.extraCoreComponentPodConfig }}
 {{ toYaml .Values.extraCoreComponentPodConfig | indent 6 -}}
 {{- end }}
-{{- if .Values.influxdb }}
+{{- if .Values.influxdb.enabled }}
 ---
 apiVersion: v1
 kind: Service
