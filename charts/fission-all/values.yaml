@@ -269,10 +269,15 @@ analyticsNonHelmInstall: false
 heapster: false
 
 ## Enable InfluxDB
-influxdb: true
+influxdb: 
+  enabled: true
+  image: influxdb:1.7
 
 ## Enable fluentbit
 fluentbit: true
+
+# Allow user to override busybox image
+busyboxImage: busybox
 
 ## Archive pruner is a garbage collector for archives on the fission storage service.
 ## This interval configures the frequency at which it runs inside the storagesvc pod.

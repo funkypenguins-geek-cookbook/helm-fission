@@ -381,7 +381,7 @@ spec:
     spec:
       containers:
       - name: influxdb
-        image: influxdb:1.7
+        image: {{ .Values.influxdb.image | quote }}
         imagePullPolicy: {{ .Values.pullPolicy }}
         env:
         - name: INFLUXDB_DB
