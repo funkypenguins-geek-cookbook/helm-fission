@@ -43,6 +43,13 @@ functionNamespace: fission-function
 ## the release namespace)
 builderNamespace: fission-builder
 
+# When applying updates, Kubernetes defaults to an update strategy of "RollingUpdate"
+# However, when RWO storage is involved, this can cause the update to get "stuck", as the
+# "old" pod is not terminated until the "new" pod is healthy, but the "new" pod needs the storage
+# currently attached to the "old" pod, in order to start. As a result, the "new" pod is never healthy
+# The resolution here is to set the strategy to "Recreate", which will first terminate the "old" pod,
+# before attempting to start the "new" pod.
+updateStrategy: Recreate
 
 # In clusters with multiple fission instances, helm will complain about pre-existing resources
 # Set the following to false to avoid (re)creating any cluster-scoped resources.

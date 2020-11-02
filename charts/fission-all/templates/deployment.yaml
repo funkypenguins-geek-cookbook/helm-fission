@@ -770,6 +770,8 @@ metadata:
     application: fission-storage
 spec:
   replicas: 1
+  strategy:
+    type: {{ .Values.updateStrategy }}
   selector:
     matchLabels:
       svc: storagesvc
