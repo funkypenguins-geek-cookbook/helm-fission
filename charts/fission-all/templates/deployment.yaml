@@ -787,7 +787,11 @@ spec:
         image: {{ include "fission-bundleImage" . | quote }}
         imagePullPolicy: {{ .Values.pullPolicy }}
         command: ["/fission-bundle"]
-        args: ["--storageServicePort", "8000", "--filePath", "/fission"]
+        {{- if and (.Values.persistence.enabled) (eq (.Values.persistence.storageType | default "local") "s3") }}
+        args: ["--storageServicePort", "8000", "--storageType", "s3"]
+        {{- else }}
+        args: ["--storageServicePort", "8000", "--storageType", "local"]
+        {{- end }}
         env:
         - name: TRACE_JAEGER_COLLECTOR_ENDPOINT
           value: "{{ .Values.traceCollectorEndpoint }}"
