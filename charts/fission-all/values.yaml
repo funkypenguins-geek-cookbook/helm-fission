@@ -132,9 +132,10 @@ logger:
   
   ## Enable PodSecurityPolicies to allow privileged container
   ## Only required in some clusters and when enableSecurityContext is true
+  # For this to take full effect, createClusterResources must also be enabled (PSPs are cluster-scoped, and can't created by multiple helm charts)
   podSecurityPolicy:
     enabled: false
-   
+
     ## Configure additional capabilities
     additionalCapabilities:
     # example values for linkerd

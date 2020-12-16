@@ -1,5 +1,6 @@
 {{- if .Values.fluentbit }}
 {{- if .Values.logger.podSecurityPolicy.enabled }}
+{{- if .Values.createClusterResources }}
 
 apiVersion: policy/v1beta1
 kind: PodSecurityPolicy
@@ -25,6 +26,7 @@ spec:
   {{- range .Values.logger.podSecurityPolicy.additionalCapabilities }}
   - {{ . }}
   {{- end }}
+{{- end }}
 {{- end }}
 {{- end }}  
 {{- end }}
