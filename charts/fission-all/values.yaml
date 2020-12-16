@@ -240,7 +240,7 @@ nats:
 
   ## Kubernetes configuration
   ## For minikube, set this to NodePort, elsewhere use LoadBalancer or ClusterIP.
-  serviceType: ClusterIP`
+  serviceType: ClusterIP
 
   ## Port at which NATS Streaming service should be exposed when a nodePort service is used
   ## (only if nats enabled and not external)  

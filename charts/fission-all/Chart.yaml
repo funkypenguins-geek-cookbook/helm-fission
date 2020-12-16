@@ -1,6 +1,6 @@
 apiVersion: v2
 name: fission-all
-version: 1.8.1-pre21
+version: 1.8.1-pre22
 description: Fission is a fast serverless framework for Kubernetes.
 keywords:
 - fission
