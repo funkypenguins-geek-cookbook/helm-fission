@@ -21,7 +21,7 @@ spec:
         messagequeue: kafka
     spec:
       securityContext:
-      {{ toYaml .Values.kafka.podSecurityContext | indent 6 }}       
+{{ toYaml .Values.kafka.podSecurityContext | indent 8 }}       
       containers:
       - name: mqtrigger
         image: "{{ .Values.image }}:{{ .Values.imageTag }}"

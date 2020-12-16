@@ -20,7 +20,7 @@ spec:
         prometheus.io/port: "8080"
     spec:
       securityContext:
-      {{ toYaml .Values.executor.podSecurityContext | indent 6 }}       
+{{ toYaml .Values.executor.podSecurityContext | indent 8 }}       
       containers:
       - name: executor
         image: {{ include "fission-bundleImage" . | quote }}

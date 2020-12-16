@@ -19,7 +19,7 @@ spec:
         application: fission-api
     spec:
       securityContext:
-      {{ toYaml .Values.controller.podSecurityContext | indent 6 }}    
+{{ toYaml .Values.controller.podSecurityContext | indent 8 }}    
       containers:
       - name: controller
         image: {{ include "fission-bundleImage" . | quote }}

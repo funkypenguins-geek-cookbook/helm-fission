@@ -21,7 +21,7 @@ spec:
         messagequeue: azure-storage-queue
     spec:
       securityContext:
-      {{ toYaml .Values.azureStorageQueue.podSecurityContext | indent 6 }}       
+{{ toYaml .Values.azureStorageQueue.podSecurityContext | indent 8 }}       
       containers:
       - name: mqtrigger
         image: "{{ .Values.image }}:{{ .Values.imageTag }}"
