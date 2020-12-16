@@ -161,12 +161,14 @@ spec:
           initialDelaySeconds: 1
           periodSeconds: 1
           failureThreshold: 30
+{{- if.Values.useLivenessProbe }}            
         livenessProbe:
           httpGet:
             path: "/healthz"
             port: 8888
           initialDelaySeconds: 35
           periodSeconds: 5
+{{- end }}          
         volumeMounts:
         - name: config-volume
           mountPath: /etc/config/config.yaml
@@ -242,12 +244,14 @@ spec:
           initialDelaySeconds: 1
           periodSeconds: 1
           failureThreshold: 30
+{{- if.Values.useLivenessProbe }}            
         livenessProbe:
           httpGet:
             path: "/healthz"
             port: 8888
           initialDelaySeconds: 35
           periodSeconds: 5
+{{- end }}          
         ports:
           - containerPort: 8080
             name: metrics

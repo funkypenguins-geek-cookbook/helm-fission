@@ -22,6 +22,12 @@ imageTag: 1.8.0
 ## Image pull policy
 pullPolicy: IfNotPresent
 
+## LivenessProbes are often misunderstood, and static analysis tools (like kube-score) can error when
+# presented with manifests which duplicate LivenessProbes and ReadinessProbes.
+# See https://github.com/zegl/kube-score/blob/master/README_PROBES.md for details
+# The setting below allows the user to disable all LivenessProbes
+useLivenessProbes: true
+
 ## Port at which Fission controller service should be exposed
 controllerPort: 31313
 
