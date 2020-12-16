@@ -1,0 +1,16 @@
+---
+# Source: fission-all/templates/pvc.yaml
+kind: PersistentVolumeClaim
+apiVersion: v1
+metadata:
+  name: fission-storage-pvc
+  labels:
+    app: fission-storage
+    chart: "fission-all-1.8.1-pre16"
+    release: "RELEASE-NAME"
+spec:
+  accessModes:
+    - "ReadWriteOnce"
+  resources:
+    requests:
+      storage: "8Gi"

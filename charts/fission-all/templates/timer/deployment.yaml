@@ -1,0 +1,36 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: timer
+  labels:
+    chart: "{{ .Chart.Name }}-{{ .Chart.Version }}"
+    svc: timer
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      svc: timer
+  template:
+    metadata:
+      labels:
+        svc: timer
+    spec:
+      securityContext:
+{{ toYaml .Values.timer.podSecurityContext | indent 8 }}       
+      containers:
+      - name: timer
+        image: {{ include "fission-bundleImage" . | quote }}
+        imagePullPolicy: {{ .Values.pullPolicy }}
+        command: ["/fission-bundle"]
+        args: ["--timer", "--routerUrl", "http://router.{{ .Release.Namespace }}"]
+        env:
+        - name: DEBUG_ENV
+          value: {{ .Values.debugEnv | quote }}
+        resources:
+{{ toYaml .Values.timer.resources | indent 10 }}           
+        securityContext:
+{{ toYaml .Values.timer.containerSecurityContext | indent 10 }}           
+      serviceAccountName: fission-svc
+{{- if .Values.extraCoreComponentPodConfig }}
+{{ toYaml .Values.extraCoreComponentPodConfig | indent 6 -}}
+{{- end }}

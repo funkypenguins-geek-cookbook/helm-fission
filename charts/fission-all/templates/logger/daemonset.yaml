@@ -1,84 +1,4 @@
 {{- if .Values.fluentbit }}
-# Fluentbit deployment for Fission
-#
-# Requires:
-# - service account: fission-svc
-apiVersion: v1
-kind: ConfigMap
-metadata:
-  name: {{ .Release.Name }}-fission-fluentbit
-data:
-{{- if .Files.Get "config/fluentbit.conf" }}
-  fluentbit.conf: |
-{{ .Files.Get "config/fluentbit.conf" | indent 3 }}
-{{ else }}
-{{ fail "invalid chart" }}
-{{- end }}
-{{- if .Files.Get "config/parsers.conf" }}
-  parsers.conf: |
-{{ .Files.Get "config/parsers.conf" | indent 3 }}
-{{ else }}
-{{ fail "invalid chart" }}
-{{- end }}
-{{- if .Values.logger.podSecurityPolicy.enabled }}
----
-apiVersion: policy/v1beta1
-kind: PodSecurityPolicy
-metadata:
-  name: {{ .Release.Name }}-fission-logger-privileged
-  labels:
-    chart: "{{ .Chart.Name }}-{{ .Chart.Version }}"
-    svc: logger
-spec:
-  privileged: true
-  seLinux:
-    rule: RunAsAny
-  supplementalGroups:
-    rule: RunAsAny
-  runAsUser:
-    rule: RunAsAny
-  fsGroup:
-    rule: RunAsAny
-  volumes:
-  - '*'
-  {{- if .Values.logger.podSecurityPolicy.additionalCapabilities }}
-  allowedCapabilities:
-  {{- range .Values.logger.podSecurityPolicy.additionalCapabilities }}
-  - {{ . }}
-  {{- end }}
-  {{- end }}
----
-apiVersion: rbac.authorization.k8s.io/v1
-kind: Role
-metadata:
-  name: psp:{{ .Release.Name }}-fission-logger-privileged
-  labels:
-    chart: "{{ .Chart.Name }}-{{ .Chart.Version }}"
-    svc: logger
-rules:
-- apiGroups: ['policy']
-  resources: ['podsecuritypolicies']
-  verbs:     ['use']
-  resourceNames:
-  - {{ .Release.Name }}-fission-logger-privileged
----
-apiVersion: rbac.authorization.k8s.io/v1
-kind: RoleBinding
-metadata:
-  name: psp:{{ .Release.Name }}-fission-logger-privileged
-  labels:
-    chart: "{{ .Chart.Name }}-{{ .Chart.Version }}"
-    svc: logger
-roleRef:
-  kind:     Role
-  name:     psp:{{ .Release.Name }}-fission-logger-privileged
-  apiGroup: rbac.authorization.k8s.io
-subjects:
-- kind:      ServiceAccount
-  name:      default
-  namespace: {{ .Release.Namespace }}
-{{- end }}
----
 apiVersion: apps/v1
 kind: DaemonSet
 metadata:
@@ -95,6 +15,8 @@ spec:
       labels:
         svc: logger
     spec:
+      securityContext:
+{{ toYaml .Values.logger.podSecurityContext | indent 8 }}     
       initContainers:
         - name: init
           image: {{ .Values.busyboxImage | quote }}
@@ -104,10 +26,10 @@ spec:
             - name: container-log
               mountPath: /var/log/
               readOnly: false
-{{- if .Values.logger.enableSecurityContext }}
           securityContext:
-            privileged: true
-{{- end }}
+{{ toYaml .Values.logger.containerSecurityContext | indent 12 }}  
+          resources:
+{{ toYaml .Values.logger.resources | indent 12 }}
       containers:
         - name: logger
 {{ if .Values.repository }}
@@ -131,10 +53,10 @@ spec:
             - name: docker-log
               mountPath: /var/lib/docker/containers
               readOnly: true
-{{- if .Values.logger.enableSecurityContext }}
           securityContext:
-            privileged: true
-{{- end }}
+{{ toYaml .Values.logger.containerSecurityContext | indent 12 }}  
+          resources:
+{{ toYaml .Values.logger.resources | indent 12 }}
         - name: fluentbit
 {{- if .Values.repository }}
           image: "{{ .Values.logger.fluentdImageRepository }}/{{ .Values.logger.fluentdImage }}:{{ .Values.logger.fluentdImageTag }}"
@@ -163,10 +85,8 @@ spec:
                   key: password
             - name: LOG_PATH
               value: /var/log/fission/*.log
-{{- if .Values.logger.enableSecurityContext }}
           securityContext:
-            privileged: true
-{{- end }}
+{{ toYaml .Values.logger.containerSecurityContext | indent 12 }}  
           volumeMounts:
             - name: container-log
               mountPath: /var/log/
@@ -177,6 +97,8 @@ spec:
             - name: fluentbit-config
               mountPath: /fluent-bit/etc/
               readOnly: true
+          resources:
+{{ toYaml .Values.logger.resources | indent 12 }}
       serviceAccountName: fission-svc
       volumes:
         - name: container-log

@@ -1,0 +1,42 @@
+# This file sets some opinionated values for kube-score to use
+# when parsing the chart, while avoiding inflicting these opinions on chart users :)
+
+pullPolicy: Always
+preUpgradeChecks: false
+analytics: false
+prometheus:
+  enabled: false
+
+busyboxImage: busybox:1.3.2
+  
+# Create template for resources to keep values file simple, details at https://blog.betomorrow.com/yaml-tips-and-tricks-for-concourse-ci-35a3b577a239
+kube_score_resources: &kube_score_resources
+  resources:
+    requests: 
+      memory: 16Mi
+      cpu: 1m
+    limits:
+      memory: 32Mi
+      cpu: 100m
+
+  podSecurityContext:
+    runAsUser: 65534
+    runAsGroup: 65534
+
+  ## User can override container securityContext below
+  containerSecurityContext:
+    readOnlyRootFilesystem: true
+    privileged: false      
+
+timer:        *kube_score_resources
+storagesvc:   *kube_score_resources
+router:       *kube_score_resources
+nats:         *kube_score_resources
+mqtrigger:    *kube_score_resources
+influxdb:     *kube_score_resources
+kubewatcher:  *kube_score_resources
+executor:     *kube_score_resources
+controller:   *kube_score_resources
+builder:      *kube_score_resources
+controller:   *kube_score_resources
+logger:       *kube_score_resources

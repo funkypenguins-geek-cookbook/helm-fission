@@ -1,0 +1,55 @@
+{{- if .Values.azureStorageQueue.enabled }}
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: mqtrigger-azure-storage-queue
+  labels:
+    chart: "{{ .Chart.Name }}-{{ .Chart.Version }}"
+    svc: mqtrigger
+    messagequeue: azure-storage-queue
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      svc: mqtrigger
+      messagequeue: azure-storage-queue
+  template:
+    metadata:
+      labels:
+        svc: mqtrigger
+        messagequeue: azure-storage-queue
+    spec:
+      securityContext:
+      {{ toYaml .Values.azureStorageQueue.podSecurityContext | indent 6 }}       
+      containers:
+      - name: mqtrigger
+        image: "{{ .Values.image }}:{{ .Values.imageTag }}"
+        imagePullPolicy: {{ .Values.pullPolicy }}
+        command: ["/fission-bundle"]
+        args: ["--mqt", "--routerUrl", "http://router.{{ .Release.Namespace }}"]
+        env:
+        - name: TRACE_JAEGER_COLLECTOR_ENDPOINT
+          value: "{{ .Values.traceCollectorEndpoint }}"
+        - name: TRACING_SAMPLING_RATE
+          value: {{ .Values.traceSamplingRate | default "0.5" | quote }}        
+        - name: MESSAGE_QUEUE_TYPE
+          value: azure-storage-queue
+        - name: AZURE_STORAGE_ACCOUNT_NAME
+          value: {{ required "An Azure storage account name is required." .Values.azureStorageQueue.accountName }}
+        - name: AZURE_STORAGE_ACCOUNT_KEY
+          valueFrom:
+            secretKeyRef:
+              name: azure-storage-account-key
+              key: key
+        - name: DEBUG_ENV
+          value: {{ .Values.debugEnv | quote }}
+      securityContext:
+      {{ toYaml .Values.azureStorageQueue.containerSecurityContext | indent 8 }}           
+      serviceAccountName: fission-svc
+      resources:
+{{ toYaml .Values.azureStorageQueue.resources | indent 12 }}           
+{{- if .Values.extraCoreComponentPodConfig }}
+{{ toYaml .Values.extraCoreComponentPodConfig | indent 6 -}}
+{{- end }}
+{{- end }}

@@ -1,0 +1,40 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: kubewatcher
+  labels:
+    chart: "{{ .Chart.Name }}-{{ .Chart.Version }}"
+    svc: kubewatcher
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      svc: kubewatcher
+  template:
+    metadata:
+      labels:
+        svc: kubewatcher
+    spec:
+      securityContext:
+{{ toYaml .Values.kubewatcher.podSecurityContext | indent 8 }}       
+      containers:
+      - name: kubewatcher
+        image: {{ include "fission-bundleImage" . | quote }}
+        imagePullPolicy: {{ .Values.pullPolicy }}
+        command: ["/fission-bundle"]
+        args: ["--kubewatcher", "--routerUrl", "http://router.{{ .Release.Namespace }}"]
+        env:
+        - name: TRACE_JAEGER_COLLECTOR_ENDPOINT
+          value: "{{ .Values.traceCollectorEndpoint }}"
+        - name: TRACING_SAMPLING_RATE
+          value: {{ .Values.traceSamplingRate | default "0.5" | quote }}
+        - name: DEBUG_ENV
+          value: {{ .Values.debugEnv | quote }}
+        securityContext:
+{{ toYaml .Values.kubewatcher.containerSecurityContext | indent 10 }}           
+        resources:
+{{ toYaml .Values.kubewatcher.resources | indent 10 }}
+      serviceAccountName: fission-svc
+{{- if .Values.extraCoreComponentPodConfig }}
+{{ toYaml .Values.extraCoreComponentPodConfig | indent 6 -}}
+{{- end }}

@@ -1,0 +1,44 @@
+---
+# Source: fission-all/templates/influxdb/deployment.yaml
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: influxdb
+  labels:
+    chart: "fission-all-1.8.1-pre16"
+    svc: influxdb
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      svc: influxdb
+  template:
+    metadata:
+      labels:
+        svc: influxdb
+    spec:
+      securityContext:
+        runAsGroup: 65534
+        runAsUser: 65534       
+      containers:
+      - name: influxdb
+        image: "influxdb:1.7"
+        imagePullPolicy: IfNotPresent
+        env:
+        - name: INFLUXDB_DB
+          value: fissionFunctionLog
+        - name: INFLUXDB_ADMIN_USER
+          valueFrom:
+            secretKeyRef:
+              name: influxdb
+              key: username
+        - name: INFLUXDB_ADMIN_PASSWORD
+          valueFrom:
+            secretKeyRef:
+              name: influxdb
+              key: password
+        securityContext:
+          privileged: false
+          readOnlyRootFilesystem: true               
+        resources:
+          {}

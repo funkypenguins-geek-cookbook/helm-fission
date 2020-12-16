@@ -1,0 +1,23 @@
+---
+# Source: fission-all/charts/prometheus/templates/alertmanager-service.yaml
+apiVersion: v1
+kind: Service
+metadata:
+  labels:
+    component: "alertmanager"
+    app: prometheus
+    release: RELEASE-NAME
+    chart: prometheus-9.3.1
+    heritage: Helm
+  name: RELEASE-NAME-prometheus-alertmanager
+spec:
+  ports:
+    - name: http
+      port: 80
+      protocol: TCP
+      targetPort: 9093
+  selector:
+    component: "alertmanager"
+    app: prometheus
+    release: RELEASE-NAME
+  type: "ClusterIP"

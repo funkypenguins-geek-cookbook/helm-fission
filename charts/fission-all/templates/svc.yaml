@@ -11,12 +11,12 @@ metadata:
 {{ toYaml .Values.router.svcAnnotations | indent 4 }}
 {{- end }}
 spec:
-  type: {{ .Values.routerServiceType }}
+  type: {{ .Values.router.serviceType }}
   ports:
   - port: 80
     targetPort: 8888
-{{- if eq .Values.routerServiceType "NodePort" }}
-    nodePort: {{ .Values.routerPort }}
+{{- if eq .Values.router.serviceType "NodePort" }}
+    nodePort: {{ .Values.router.nodePort }}
 {{- end }}
   selector:
     svc: router
@@ -31,12 +31,12 @@ metadata:
     application: fission-api
     chart: "{{ .Chart.Name }}-{{ .Chart.Version }}"
 spec:
-  type: {{ .Values.serviceType }}
+  type: {{ .Values.controller.serviceType }}
   ports:
   - port: 80
     targetPort: 8888
-{{- if eq .Values.serviceType "NodePort" }}
-    nodePort: {{ .Values.controllerPort }}
+{{- if eq .Values.controller.serviceType "NodePort" }}
+    nodePort: {{ .Values.controller.nodePort }}
 {{- end }}
   selector:
     svc: controller
@@ -51,12 +51,12 @@ metadata:
     svc: nats-streaming
     chart: "{{ .Chart.Name }}-{{ .Chart.Version }}"
 spec:
-  type: {{ .Values.serviceType }}
+  type: {{ .Values.nats.serviceType }}
   ports:
   - port: 4222
     targetPort: 4222
-{{- if eq .Values.serviceType "NodePort" }}
-    nodePort: {{ .Values.natsStreamingPort }}
+{{- if eq .Values.nats.serviceType "NodePort" }}
+    nodePort: {{ .Values.nats.nodePort }}
 {{- end }}
     name: tcp-nats-streaming
   selector:

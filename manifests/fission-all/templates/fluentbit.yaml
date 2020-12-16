@@ -1,0 +1,182 @@
+---
+# Source: fission-all/templates/fluentbit.yaml
+# Fluentbit deployment for Fission
+#
+# Requires:
+# - service account: fission-svc
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: RELEASE-NAME-fission-fluentbit
+data:
+  fluentbit.conf: |
+   # Some stuff in this file is copied out of https://github.com/fluent/fluent-bit-kubernetes-logging/blob/master/output/kafka/fluent-bit-configmap.yaml
+   [SERVICE]
+       Flush 5
+       Log_Level info
+       Parsers_File parsers.conf
+   
+   [INPUT]
+       Name tail
+       Tag log.*
+       Path ${LOG_PATH}
+       Mem_Buf_Limit 5MB
+       Parser docker
+       DB /var/log/fission/flb_kube.db
+       Skip_Long_Lines   On
+       Refresh_Interval  10
+   
+   [FILTER]
+       Name kubernetes
+       Match log.*
+       Kube_URL https://kubernetes.default.svc.cluster.local:443
+   
+   #
+   # Flatten kubernetes labels so we can tag and query functionuid with influxdb
+   #
+   [FILTER]
+       Name nest
+       Match log.*
+       Operation lift
+       Nested_under kubernetes
+       Prefix_with kubernetes_
+   
+   [FILTER]
+       Name nest
+       Match log.*
+       Operation lift
+       Nested_under kubernetes_labels
+       Prefix_with kubernetes_labels_
+   
+   [OUTPUT]
+       Name influxdb
+       Match log.*
+       Host ${INFLUXDB_ADDRESS}
+       Port ${INFLUXDB_PORT}
+       Database ${INFLUXDB_DBNAME}
+       HTTP_User ${INFLUXDB_USERNAME}
+       HTTP_Passwd ${INFLUXDB_PASSWD}
+       Tag_Keys kubernetes_labels_functionUid
+       Sequence_Tag  _seq
+   
+   
+   # Useful for testing config changes
+   #[OUTPUT]
+   #    Name file
+   #    Match log.*
+   #    Path /flbout.txt
+   
+
+  parsers.conf: |
+   [PARSER]
+       Name        docker
+       Format      json
+       Time_Key    time
+       Time_Format %Y-%m-%dT%H:%M:%S.%L
+       Time_Keep   On
+   
+       # next bit is useful when the logs from the function itself are in json
+       # Command      |  Decoder | Field | Optional Action
+       # =============|==================|=================
+       #Decode_Field_As   escaped    log
+---
+# Source: fission-all/templates/fluentbit.yaml
+apiVersion: apps/v1
+kind: DaemonSet
+metadata:
+  name: logger
+  labels:
+    chart: "fission-all-1.8.1-pre16"
+    svc: logger
+spec:
+  selector:
+    matchLabels:
+      svc: logger
+  template:
+    metadata:
+      labels:
+        svc: logger
+    spec:
+      securityContext:
+                  null     
+      initContainers:
+        - name: init
+          image: "busybox"
+          imagePullPolicy: IfNotPresent
+          command: ['mkdir', '-p', '/var/log/fission']
+          volumeMounts:
+            - name: container-log
+              mountPath: /var/log/
+              readOnly: false
+      containers:
+        - name: logger
+
+          image: "index.docker.io/fission/fission-bundle:1.8.0"
+
+          imagePullPolicy: IfNotPresent
+          env:
+            - name: NODE_NAME
+              valueFrom:
+                fieldRef:
+                  apiVersion: v1
+                  fieldPath: spec.nodeName
+          command: ["/fission-bundle"]
+          args: ["--logger"]
+          volumeMounts:
+            - name: container-log
+              mountPath: /var/log/
+              readOnly: false
+            - name: docker-log
+              mountPath: /var/lib/docker/containers
+              readOnly: true
+        - name: fluentbit
+          image: "index.docker.io/fluent/fluent-bit:1.0.4"
+
+          imagePullPolicy: IfNotPresent
+          # CMD ["/fluent-bit/bin/fluent-bit", "-c", "/fluent-bit/etc/fluent-bit.conf"]
+          command: ["/fluent-bit/bin/fluent-bit", "-c", "/fluent-bit/etc/fluentbit.conf"]
+          env:
+            - name: INFLUXDB_ADDRESS
+              value: influxdb
+            - name: INFLUXDB_PORT
+              value: "8086"
+            - name: INFLUXDB_DBNAME
+              value: "fissionFunctionLog"
+            - name: INFLUXDB_USERNAME
+              valueFrom:
+                secretKeyRef:
+                  name: influxdb
+                  key: username
+            - name: INFLUXDB_PASSWD
+              valueFrom:
+                secretKeyRef:
+                  name: influxdb
+                  key: password
+            - name: LOG_PATH
+              value: /var/log/fission/*.log
+          volumeMounts:
+            - name: container-log
+              mountPath: /var/log/
+              readOnly: false
+            - name: docker-log
+              mountPath: /var/lib/docker/containers
+              readOnly: true
+            - name: fluentbit-config
+              mountPath: /fluent-bit/etc/
+              readOnly: true
+      serviceAccountName: fission-svc
+      volumes:
+        - name: container-log
+          hostPath:
+            path: /var/log/
+        - name: docker-log
+          hostPath:
+            path: /var/lib/docker/containers
+        # Fluentbit config location: /fluent-bit/etc/*.conf
+        - name: fluentbit-config
+          configMap:
+            name: RELEASE-NAME-fission-fluentbit
+      resources:
+            {}                 
+  updateStrategy:
+    type: RollingUpdate

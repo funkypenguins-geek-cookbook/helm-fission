@@ -1,0 +1,37 @@
+---
+# Source: fission-all/templates/timer/deployment.yaml
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: timer
+  labels:
+    chart: "fission-all-1.8.1-pre16"
+    svc: timer
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      svc: timer
+  template:
+    metadata:
+      labels:
+        svc: timer
+    spec:
+      securityContext:
+        runAsGroup: 65534
+        runAsUser: 65534       
+      containers:
+      - name: timer
+        image: "index.docker.io/fission/fission-bundle:1.8.0"
+        imagePullPolicy: IfNotPresent
+        command: ["/fission-bundle"]
+        args: ["--timer", "--routerUrl", "http://router.default"]
+        env:
+        - name: DEBUG_ENV
+          value: "false"
+        resources:
+          {}           
+        securityContext:
+          privileged: false
+          readOnlyRootFilesystem: true           
+      serviceAccountName: fission-svc

@@ -1,29 +1,53 @@
-{{- if .Values.createNamespace }}
-apiVersion: v1
-kind: Namespace
-metadata:
-  name: {{ .Values.functionNamespace }}
-  labels:
-    name: fission-function
-    chart: "{{ .Chart.Name }}-{{ .Chart.Version }}"
-    {{- if .Values.enableIstio }}
-    istio-injection: enabled
-    {{- end }}
-
 ---
+# Source: fission-all/templates/deployment.yaml
 apiVersion: v1
 kind: Namespace
 metadata:
-  name: {{ .Values.builderNamespace }}
+  name: fission-builder
   labels:
     name: fission-builder
-    chart: "{{ .Chart.Name }}-{{ .Chart.Version }}"
-    {{- if .Values.enableIstio }}
-    istio-injection: enabled
-    {{- end }}
-{{- end }}
-{{- if .Values.createClusterResources }}
+    chart: "fission-all-1.8.1-pre16"
 ---
+# Source: fission-all/templates/deployment.yaml
+apiVersion: v1
+kind: Namespace
+metadata:
+  name: fission-function
+  labels:
+    name: fission-function
+    chart: "fission-all-1.8.1-pre16"
+---
+# Source: fission-all/templates/deployment.yaml
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: feature-config
+  namespace: default
+data:
+  "config.yaml": Y2FuYXJ5OgogIGVuYWJsZWQ6IHRydWUKICBwcm9tZXRoZXVzU3ZjOiAiaHR0cDovL1JFTEVBU0UtTkFNRS1wcm9tZXRoZXVzLXNlcnZlci5kZWZhdWx0Igo=
+---
+# Source: fission-all/templates/deployment.yaml
+apiVersion: v1
+kind: ServiceAccount
+metadata:
+  name: fission-builder
+  namespace: fission-builder
+---
+# Source: fission-all/templates/deployment.yaml
+apiVersion: v1
+kind: ServiceAccount
+metadata:
+  name: fission-svc
+  namespace: default
+---
+# Source: fission-all/templates/deployment.yaml
+apiVersion: v1
+kind: ServiceAccount
+metadata:
+  name: fission-fetcher
+  namespace: fission-function
+---
+# Source: fission-all/templates/deployment.yaml
 apiVersion: rbac.authorization.k8s.io/v1
 kind: ClusterRole
 metadata:
@@ -38,8 +62,8 @@ rules:
   - get
   - watch
   - list
-
 ---
+# Source: fission-all/templates/deployment.yaml
 apiVersion: rbac.authorization.k8s.io/v1
 kind: ClusterRole
 metadata:
@@ -54,6 +78,7 @@ rules:
   - watch
   - list
 ---
+# Source: fission-all/templates/deployment.yaml
 kind: ClusterRoleBinding
 apiVersion: rbac.authorization.k8s.io/v1
 metadata:
@@ -61,59 +86,28 @@ metadata:
 subjects:
 - kind: ServiceAccount
   name: fission-svc
-  namespace: {{ .Release.Namespace }}
+  namespace: default
 roleRef:
   kind: ClusterRole
   name: cluster-admin
   apiGroup: rbac.authorization.k8s.io
-
-{{- end }}
 ---
-apiVersion: v1
-kind: ServiceAccount
-metadata:
-  name: fission-svc
-  namespace: {{ .Release.Namespace }}
-
----
+# Source: fission-all/templates/deployment.yaml
 kind: RoleBinding
 apiVersion: rbac.authorization.k8s.io/v1
 metadata:
   name: fission-admin
-  namespace: {{ .Release.Namespace }}
+  namespace: default
 subjects:
   - kind: ServiceAccount
     name: fission-svc
-    namespace: {{ .Release.Namespace }}
+    namespace: default
 roleRef:
   kind: ClusterRole
   name: admin
   apiGroup: rbac.authorization.k8s.io
-
 ---
-apiVersion: v1
-kind: ServiceAccount
-metadata:
-  name: fission-fetcher
-  namespace: {{ .Values.functionNamespace }}
----
-apiVersion: v1
-kind: ServiceAccount
-metadata:
-  name: fission-builder
-  namespace: {{ .Values.builderNamespace }}
-
----
-apiVersion: v1
-kind: ConfigMap
-metadata:
-  name: feature-config
-  namespace: {{ .Release.Namespace }}
-data:
-  "config.yaml": {{ include "config" . | b64enc }}
-
----
-
+# Source: fission-all/templates/deployment.yaml
 #
 # This is commented out until fission-ui allows configuring the
 # namespace. Right now it just crashes if Release.Namespace !=
@@ -125,7 +119,7 @@ data:
 #metadata:
 #  name: fission-ui
 #  labels:
-#    chart: "{{ .Chart.Name }}-{{ .Chart.Version }}"
+#    chart: "fission-all-1.8.1-pre16"
 #spec:
 #  replicas: 1
 #  template:
@@ -135,16 +129,9 @@ data:
 #    spec:
 #      containers:
 #      - name: nginx
-#        image: {{ .Values.repository }}/{{ .Values.fissionUiImage }}
-#        imagePullPolicy: {{ .Values.pullPolicy }}
+#        image: index.docker.io/
+#        imagePullPolicy: IfNotPresent
 #      - name: kubectl-proxy
-#        image: {{ .Values.repository }}/lachlanevenson/k8s-kubectl
+#        image: index.docker.io/lachlanevenson/k8s-kubectl
 #        args: ["proxy", "--port", "8001", "--address", "127.0.0.1"]
 #      serviceAccountName: fission-svc
-
-
-
-
-
-
----

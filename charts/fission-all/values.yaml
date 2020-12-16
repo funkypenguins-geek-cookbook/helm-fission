@@ -2,13 +2,6 @@
 # Fission chart configuration
 #
 
-## Kubernetes configuration
-## For minikube, set this to NodePort, elsewhere use LoadBalancer or ClusterIP.
-serviceType: ClusterIP
-
-## For minikube, set this to NodePort, elsewhere use LoadBalancer or ClusterIP.
-routerServiceType: LoadBalancer
-
 ## Image base repository
 ## Leave it empty for using existing local image
 repository: index.docker.io
@@ -21,16 +14,6 @@ pullPolicy: IfNotPresent
 
 ## Fission image version
 imageTag: 1.8.0
-
-## Port at which Fission controller service should be exposed
-controllerPort: 31313
-
-## Port at which Fission router service should be exposed
-routerPort: 31314
-
-## Port at which NATS streaming service should be exposed
-## (only if nats enabled and not external)
-natsStreamingPort: 31316
 
 ## Set to false if you create the namespaces manually
 createNamespace: true
@@ -64,6 +47,33 @@ createNamespace: true
 ## Enable istio integration
 enableIstio: false
 
+controller:
+  ## Kubernetes configuration
+  ## For minikube, set this to NodePort, elsewhere use LoadBalancer or ClusterIP.
+  serviceType: ClusterIP
+
+  ## Port at which Fission controller service should be exposed when a nodePort service is used
+  nodePort: 31313
+
+  ## User can override resource limits/requests below
+  resources: {}
+
+  ## User can override pod securityContext below
+  podSecurityContext: {}
+
+  ## User can override container securityContext below
+  containerSecurityContext: {}  
+
+builder:
+  ## User can override resource limits/requests below
+  resources: {}
+
+  ## User can override pod securityContext below
+  podSecurityContext: {}
+
+  ## User can override container securityContext below
+  containerSecurityContext: {}  
+
 fetcher:
   ## Fetcher repository
   image: fission/fetcher
@@ -72,7 +82,7 @@ fetcher:
   
   ## Fetcher is only for to downloading or uploading archive.
   ## Normally, you don't need to change the value here, unless necessary.
-  resource:
+  resources:
     cpu:
       requests: "10m"
       ## Low CPU limits will increases the function specialization time.
@@ -81,6 +91,32 @@ fetcher:
       requests: "16Mi"
       limits: ""
 
+  ## User can override pod securityContext below
+  podSecurityContext: {}
+
+  ## User can override container securityContext below
+  containerSecurityContext: {}       
+
+kubewatcher:
+  ## User can override resource limits/requests below
+  resources: {}
+
+  ## User can override pod securityContext below
+  podSecurityContext: {}
+
+  ## User can override container securityContext below
+  containerSecurityContext: {}  
+
+timer:
+  ## User can override resource limits/requests below
+  resources: {}
+
+  ## User can override pod securityContext below
+  podSecurityContext: {}
+
+  ## User can override container securityContext below
+  containerSecurityContext: {}  
+
 ## Logger config
 logger:
   influxdbAdmin: "admin"
@@ -88,13 +124,6 @@ logger:
   fluentdImage: fluent/fluent-bit
   fluentdImageTag: 1.0.4
   
-  ## Fluent-bit writes/reads it’s own sqlite database to record a history of tracked
-  ## files and a state of offsets, this is very useful to resume a state if the ser-
-  ## vice is restarted. For Kubernetes environment with constraints like OpenShift,
-  ## the containers are limited to write hostPath volume. Hence, we have to enable
-  ## security context and set privileged to true.
-  enableSecurityContext: false
-
   ## Enable PodSecurityPolicies to allow privileged container
   ## Only required in some clusters and when enableSecurityContext is true
   podSecurityPolicy:
@@ -106,14 +135,44 @@ logger:
     #- NET_RAW
     #- NET_ADMIN
 
+  ## User can override resource limits/requests below
+  resources: {}
+
+  ## User can override pod securityContext below
+  podSecurityContext: {}
+
+  ## User can override container securityContext below
+  ## Fluent-bit writes/reads it’s own sqlite database to record a history of tracked
+  ## files and a state of offsets, this is very useful to resume a state if the ser-
+  ## vice is restarted. For Kubernetes environment with constraints like OpenShift,
+  ## the containers are limited to write hostPath volume. Hence, we have to enable
+  ## security context and set privileged to true.  
+  containerSecurityContext: {}
+    # privileged: true
+
 executor:
   adoptExistingResources: false
+
+  ## User can override resource limits/requests below
+  resources: {}
+
+  ## User can override pod securityContext below
+  podSecurityContext: {}
+
+  ## User can override container securityContext below
+  containerSecurityContext: {}  
 
 ## Router config
 router:
   deployAsDaemonSet: false
   svcAddressMaxRetries: 5
   svcAddressUpdateTimeout: 30s
+
+  ## For minikube, set this to NodePort, elsewhere use LoadBalancer or ClusterIP.
+  serviceType: LoadBalancer
+
+  ## Used if the router is exposed via NodePort
+  nodePort: 31314
   
   ## Display endpoint access logs
   ## To be aware of enabling logging endpoint access log, it increases
@@ -158,11 +217,28 @@ router:
   ## Sample with a rate per time window (traces/second)
   traceSamplingRate: 0.5
 
+  ## User can override resource limits/requests below
+  resources: {}
+
+  ## User can override pod securityContext below
+  podSecurityContext: {}
+
+  ## User can override container securityContext below
+  containerSecurityContext: {}  
+
 ## Message queue trigger config
 ### NATS Streaming, enabled by default
 nats:
   # whether or not to use NATS
   enabled: true
+
+  ## Kubernetes configuration
+  ## For minikube, set this to NodePort, elsewhere use LoadBalancer or ClusterIP.
+  serviceType: ClusterIP`
+
+  ## Port at which NATS Streaming service should be exposed when a nodePort service is used
+  ## (only if nats enabled and not external)  
+  nodePort: 31313
 
   # if true, don't install NATS, but
   external: false
@@ -185,7 +261,38 @@ nats:
 
   # The image to use for NATS streaming server
   streamingserver:
-    image: nats-streaming
+    image: "nats-streaming:alpine"
+
+  ## User can override resource limits/requests below
+  resources: {}
+
+  ## User can override pod securityContext below
+  podSecurityContext: {}
+
+  ## User can override container securityContext below
+  containerSecurityContext: {}  
+
+mqtrigger:
+
+  ## User can override resource limits/requests below
+  resources: {}
+
+  ## User can override pod securityContext below
+  podSecurityContext: {}
+
+  ## User can override container securityContext below
+  containerSecurityContext: {}  
+
+storagesvc:
+
+  ## User can override resource limits/requests below
+  resources: {}
+
+  ## User can override pod securityContext below
+  podSecurityContext: {}
+
+  ## User can override container securityContext below
+  containerSecurityContext: {}  
 
 ## Azure-storage-queue: enable and configure the details
 azureStorageQueue:
@@ -193,6 +300,15 @@ azureStorageQueue:
   key: ""
   accountName: ""
   
+  ## User can override resource limits/requests below
+  resources: {}   
+
+  ## User can override pod securityContext below
+  podSecurityContext: {}
+
+  ## User can override container securityContext below
+  containerSecurityContext: {}  
+
 ## Kafka: enable and configure the details
 kafka:
   enabled: false
@@ -222,6 +338,15 @@ kafka:
   ## "major.major.veryMinor" example: 2.0.1
   ## Should be >= 0.11.2.0 to enable Kafka record headers support
   # version: "0.11.2.0"
+
+  ## User can override resource limits/requests below
+  resources: {}     
+
+  ## User can override pod securityContext below
+  podSecurityContext: {}
+
+  ## User can override container securityContext below
+  containerSecurityContext: {}  
 
 ## Persist data to a persistent volume.
 persistence:
@@ -279,6 +404,15 @@ heapster: false
 influxdb: 
   enabled: true
   image: influxdb:1.7
+
+  ## User can override resource limits/requests below
+  resources: {}
+
+  ## User can override pod securityContext below
+  podSecurityContext: {}
+
+  ## User can override container securityContext below
+  containerSecurityContext: {}  
 
 ## Enable fluentbit
 fluentbit: true

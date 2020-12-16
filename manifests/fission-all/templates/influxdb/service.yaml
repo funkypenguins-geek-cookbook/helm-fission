@@ -1,0 +1,17 @@
+---
+# Source: fission-all/templates/influxdb/service.yaml
+apiVersion: v1
+kind: Service
+metadata:
+  name: influxdb
+  labels:
+    svc: influxdb
+    chart: "fission-all-1.8.1-pre16"
+spec:
+  type: ClusterIP
+  ports:
+  - port: 8086
+    targetPort: 8086
+    name: tcp-influxdb
+  selector:
+    svc: influxdb

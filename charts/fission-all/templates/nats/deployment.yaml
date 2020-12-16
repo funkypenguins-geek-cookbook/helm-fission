@@ -1,0 +1,60 @@
+
+{{- if .Values.nats.enabled }}
+{{- if not .Values.nats.external }}
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  labels:
+    svc: nats-streaming
+  name: nats-streaming
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      svc: nats-streaming
+  template:
+    metadata:
+      labels:
+        svc: nats-streaming
+    spec:
+      securityContext:
+{{ toYaml .Values.nats.podSecurityContext | indent 8 }}       
+      serviceAccount: fission-nats-streaming
+      containers:
+      - name: nats-streaming
+        image: {{ .Values.nats.streamingserver.image | quote }}
+        imagePullPolicy: {{ .Values.pullPolicy }}
+        args: [
+          "--cluster_id", "{{ .Values.nats.clusterID }}",
+          "--auth", "{{ .Values.nats.authToken }}",
+          "--max_channels", "0",
+          "--http_port", "4223"
+        ]
+        ports:
+        - containerPort: 4222
+          protocol: TCP
+        - containerPort: 4223
+          protocol: TCP
+        readinessProbe:
+          httpGet:
+            path: "/streaming/serverz"
+            port: 4223
+          initialDelaySeconds: 30
+          periodSeconds: 1
+          failureThreshold: 30
+        livenessProbe:
+          httpGet:
+            path: "/streaming/serverz"
+            port: 4223
+          initialDelaySeconds: 30
+          periodSeconds: 5
+        securityContext:
+{{ toYaml .Values.nats.containerSecurityContext | indent 10 }}           
+        resources:
+{{ toYaml .Values.nats.resources | indent 10 }}               
+{{- if .Values.extraCoreComponentPodConfig }}
+{{ toYaml .Values.extraCoreComponentPodConfig | indent 6 -}}
+{{- end }}
+{{- end }}
+{{- end }}

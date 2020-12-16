@@ -1,0 +1,13 @@
+---
+# Source: fission-all/charts/prometheus/templates/alertmanager-clusterrole.yaml
+apiVersion: rbac.authorization.k8s.io/v1beta1
+kind: ClusterRole
+metadata:
+  labels:
+    component: "alertmanager"
+    app: prometheus
+    release: RELEASE-NAME
+    chart: prometheus-9.3.1
+    heritage: Helm
+  name: RELEASE-NAME-prometheus-alertmanager
+rules:

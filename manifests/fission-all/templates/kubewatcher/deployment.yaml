@@ -1,0 +1,41 @@
+---
+# Source: fission-all/templates/kubewatcher/deployment.yaml
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: kubewatcher
+  labels:
+    chart: "fission-all-1.8.1-pre16"
+    svc: kubewatcher
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      svc: kubewatcher
+  template:
+    metadata:
+      labels:
+        svc: kubewatcher
+    spec:
+      securityContext:
+      runAsGroup: 65534
+      runAsUser: 65534       
+      containers:
+      - name: kubewatcher
+        image: "index.docker.io/fission/fission-bundle:1.8.0"
+        imagePullPolicy: IfNotPresent
+        command: ["/fission-bundle"]
+        args: ["--kubewatcher", "--routerUrl", "http://router.default"]
+        env:
+        - name: TRACE_JAEGER_COLLECTOR_ENDPOINT
+          value: ""
+        - name: TRACING_SAMPLING_RATE
+          value: "0.5"
+        - name: DEBUG_ENV
+          value: "false"
+        securityContext:
+          privileged: false
+          readOnlyRootFilesystem: true           
+        resources:
+          {}
+      serviceAccountName: fission-svc

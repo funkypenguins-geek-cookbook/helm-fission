@@ -1,0 +1,63 @@
+{{- if .Values.nats.enabled }}
+{{- if not .Values.nats.external }}
+
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: mqtrigger-nats-streaming
+  labels:
+    chart: "{{ .Chart.Name }}-{{ .Chart.Version }}"
+    svc: mqtrigger
+    messagequeue: nats-streaming
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      svc: mqtrigger
+      messagequeue: nats-streaming
+  template:
+    metadata:
+      labels:
+        svc: mqtrigger
+        messagequeue: nats-streaming
+    spec:
+      securityContext:
+{{ toYaml .Values.mqtrigger.podSecurityContext | indent 8 }}       
+      containers:
+      - name: mqtrigger
+        image: {{ include "fission-bundleImage" . | quote }}
+        imagePullPolicy: {{ .Values.pullPolicy }}
+        command: ["/fission-bundle"]
+        args: ["--mqt", "--routerUrl", "http://router.{{ .Release.Namespace }}"]
+        env:
+        - name: MESSAGE_QUEUE_TYPE
+          value: nats-streaming
+        - name: MESSAGE_QUEUE_CLUSTER_ID
+          value: {{ .Values.nats.clusterID }}
+        - name: MESSAGE_QUEUE_QUEUE_GROUP
+          value: {{ .Values.nats.queueGroup }}
+        - name: MESSAGE_QUEUE_CLIENT_ID
+          value: {{ .Values.nats.clientID }}
+        - name: MESSAGE_QUEUE_URL
+        {{- if .Values.nats.authToken }}
+          value: nats://{{ .Values.nats.authToken }}@{{ .Values.nats.hostaddress }}
+        {{- else }}
+          value: nats://{{ .Values.nats.hostaddress }}
+        {{- end }}
+        - name: TRACE_JAEGER_COLLECTOR_ENDPOINT
+          value: "{{ .Values.traceCollectorEndpoint }}"
+        - name: TRACING_SAMPLING_RATE
+          value: {{ .Values.traceSamplingRate | default "0.5" | quote }}
+        - name: DEBUG_ENV
+          value: {{ .Values.debugEnv | quote }}
+        securityContext:
+{{ toYaml .Values.mqtrigger.containerSecurityContext | indent 10 }}           
+        resources:
+{{ toYaml .Values.mqtrigger.resources | indent 10 }}           
+      serviceAccountName: fission-svc
+{{- if .Values.extraCoreComponentPodConfig }}
+{{ toYaml .Values.extraCoreComponentPodConfig | indent 6 -}}
+{{- end }}
+{{- end }}
+{{- end }}

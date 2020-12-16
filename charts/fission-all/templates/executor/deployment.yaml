@@ -1,0 +1,80 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: executor
+  labels:
+    chart: "{{ .Chart.Name }}-{{ .Chart.Version }}"
+    svc: executor
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      svc: executor
+  template:
+    metadata:
+      labels:
+        svc: executor
+      annotations:
+        prometheus.io/scrape: "true"
+        prometheus.io/path: "/metrics"
+        prometheus.io/port: "8080"
+    spec:
+      securityContext:
+      {{ toYaml .Values.executor.podSecurityContext | indent 6 }}       
+      containers:
+      - name: executor
+        image: {{ include "fission-bundleImage" . | quote }}
+        imagePullPolicy: {{ .Values.pullPolicy }}
+        command: ["/fission-bundle"]
+        args: ["--executorPort", "8888", "--namespace", "{{ .Values.functionNamespace }}"]
+        env:
+        - name: FETCHER_IMAGE
+          value: "{{ .Values.fetcher.image }}:{{ .Values.fetcher.imageTag }}"
+        - name: FETCHER_IMAGE_PULL_POLICY
+          value: "{{ .Values.pullPolicy }}"
+        - name: RUNTIME_IMAGE_PULL_POLICY
+          value: "{{ .Values.pullPolicy }}"
+        - name: ADOPT_EXISTING_RESOURCES
+          value: {{ .Values.executor.adoptExistingResources | default false | quote }}
+        - name: ENABLE_ISTIO
+          value: "{{ .Values.enableIstio }}"
+        - name: TRACE_JAEGER_COLLECTOR_ENDPOINT
+          value: "{{ .Values.traceCollectorEndpoint }}"
+        - name: TRACING_SAMPLING_RATE
+          value: {{ .Values.traceSamplingRate | default "0.5" | quote }}
+        - name: FETCHER_MINCPU
+          value: {{ .Values.fetcher.resources.cpu.requests | quote }}
+        - name: FETCHER_MINMEM
+          value: {{ .Values.fetcher.resources.mem.requests | quote }}
+        - name: FETCHER_MAXCPU
+          value: {{ .Values.fetcher.resources.cpu.limits | quote }}
+        - name: FETCHER_MAXMEM
+          value: {{ .Values.fetcher.resources.mem.limits | quote }}
+        - name: DEBUG_ENV
+          value: {{ .Values.debugEnv | quote }}
+        readinessProbe:
+          httpGet:
+            path: "/healthz"
+            port: 8888
+          initialDelaySeconds: 1
+          periodSeconds: 1
+          failureThreshold: 30
+        livenessProbe:
+          httpGet:
+            path: "/healthz"
+            port: 8888
+          initialDelaySeconds: 35
+          periodSeconds: 5
+        ports:
+        - containerPort: 8080
+          name: metrics
+        - containerPort: 8888
+          name: http
+        securityContext:
+{{ toYaml .Values.executor.containerSecurityContext | indent 10 }}  
+        resources:
+{{ toYaml .Values.executor.resources | indent 10 }}                 
+      serviceAccountName: fission-svc
+{{- if .Values.extraCoreComponentPodConfig }}
+{{ toYaml .Values.extraCoreComponentPodConfig | indent 6 -}}
+{{- end }}
