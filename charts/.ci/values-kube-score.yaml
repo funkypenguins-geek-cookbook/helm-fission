@@ -9,7 +9,8 @@ prometheus:
 
 busyboxImage: busybox:1.3.2
 
-useLivenessProbes: true
+livenessProbes:
+  enabled: true
 
 # Create template for resources to keep values file simple, details at https://blog.betomorrow.com/yaml-tips-and-tricks-for-concourse-ci-35a3b577a239
 kube_score_resources: &kube_score_resources
