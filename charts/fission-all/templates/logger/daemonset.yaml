@@ -53,6 +53,8 @@ spec:
             - name: docker-log
               mountPath: /var/lib/docker/containers
               readOnly: true
+            - name: tmp
+              mountPath: /tmp
           securityContext:
 {{ toYaml .Values.logger.containerSecurityContext | indent 12 }}  
           resources:
@@ -111,6 +113,8 @@ spec:
         - name: fluentbit-config
           configMap:
             name: {{ .Release.Name }}-fission-fluentbit
+        - name: tmp
+          emptyDir: {}
   updateStrategy:
     type: RollingUpdate
 {{- end }}
