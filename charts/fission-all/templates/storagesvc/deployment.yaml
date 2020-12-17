@@ -30,6 +30,8 @@ spec:
       {{- else }}
         emptyDir: {}
       {{- end }}      
+      - name: tmp
+        emptyDir: {}
       containers:
       - name: storagesvc
         image: {{ include "fission-bundleImage" . | quote }}
@@ -52,6 +54,8 @@ spec:
         volumeMounts:
         - name: fission-storage
           mountPath: /fission
+        - name: tmp
+          mountPath: /tmp          
         readinessProbe:
           httpGet:
             path: "/healthz"
