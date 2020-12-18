@@ -20,7 +20,10 @@ spec:
         prometheus.io/port: "8080"
     spec:
       securityContext:
-{{ toYaml .Values.executor.podSecurityContext | indent 8 }}       
+{{ toYaml .Values.executor.podSecurityContext | indent 8 }} 
+      volumes:
+      - name: tmp
+        emptyDir: {}      
       containers:
       - name: executor
         image: {{ include "fission-bundleImage" . | quote }}
@@ -52,6 +55,9 @@ spec:
           value: {{ .Values.fetcher.resources.mem.limits | quote }}
         - name: DEBUG_ENV
           value: {{ .Values.debugEnv | quote }}
+        volumeMounts:
+        - name: tmp
+          mountPath: /tmp          
         readinessProbe:
           httpGet:
             path: "/healthz"

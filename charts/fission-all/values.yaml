@@ -45,6 +45,12 @@ updateStrategy: Recreate
 # It's then up to you to ensure that the necessary clusterresources are created'
 createClusterResources: true
 
+# Further to the above, it's possible to apply more restrictive RBAC rules in a multi-fission
+# cluster, to prevent fission components in one namemspace from interacting with other namespaces.
+# This is intended to be used in combination with `createClusterResources` above, and _will_ generate
+# noisy logs (until updates are made to the code to allow confining the fission daemons to a single namespace)
+namespaceIsolation: false
+
 # Whether or not to create namespaces for builder/fetcher as part of the helm install
 # In some configurations, a service account may have privilegdes to deploy into a namespace, but not
 # to create additional namespaces (so the namespaces must be pre-prepared)

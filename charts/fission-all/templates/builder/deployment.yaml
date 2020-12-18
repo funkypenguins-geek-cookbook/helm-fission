@@ -16,7 +16,10 @@ spec:
         svc: buildermgr
     spec:
       securityContext:
-{{ toYaml .Values.builder.podSecurityContext | indent 8 }}       
+{{ toYaml .Values.builder.podSecurityContext | indent 8 }}   
+      volumes:
+      - name: tmp
+        emptyDir: {}      
       containers:
       - name: buildermgr
         image: {{ include "fission-bundleImage" . | quote }}
@@ -46,6 +49,9 @@ spec:
           value: {{ .Values.fetcher.resources.mem.limits | quote }}
         - name: DEBUG_ENV
           value: {{ .Values.debugEnv | quote }}
+        volumeMounts:
+        - name: tmp
+          mountPath: /tmp
         securityContext:
 {{ toYaml .Values.builder.containerSecurityContext | indent 10 }}           
         resources:

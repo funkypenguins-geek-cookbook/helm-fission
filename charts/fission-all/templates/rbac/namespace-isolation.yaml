@@ -1,0 +1,71 @@
+{{- if .Values.namespaceIsolation }}
+kind: Role
+apiVersion: rbac.authorization.k8s.io/v1beta1
+metadata:
+  name: fission-namespace-admin
+rules:
+- apiGroups:
+    - "fission.io"
+  resources: ["*"]
+  verbs: ["*"]
+---
+kind: RoleBinding
+apiVersion: rbac.authorization.k8s.io/v1
+metadata:
+  name: fission-namespace-admin
+  namespace: {{ .Release.Namespace }}
+subjects:
+- kind: ServiceAccount
+  name: fission-svc
+roleRef:
+  kind: ClusterRole
+  name: admin
+  apiGroup: rbac.authorization.k8s.io
+---
+# The fission controller needs to look at the CRDs
+kind: ClusterRole
+apiVersion: rbac.authorization.k8s.io/v1beta1
+metadata:
+  name: fission-cluster-access
+rules:
+  # any of the fission pods should be able to view custom resources at a cluster-wide scope
+- apiGroups:
+    - "fission.io"
+  resources:
+  - "environments"
+  - "packages"
+  - "functions"
+  - "httptriggers"
+  verbs: ["watch","get","list"]
+- apiGroups:
+    - ""
+    - "apps"
+  resources:
+  - "configmaps"
+  - "pods"
+  - "services"
+  - "deployments"
+  - "secrets"
+  verbs: ["list","watch","delete"] # not ideal, but minimal required to avoid fission services crashing atm
+- apiGroups:
+    - "fission.io"
+  resources: ["*"]
+  verbs: ["list"]
+  # allow the controller to manage any ission CRDs
+- apiGroups: ["apiextensions.k8s.io"]
+  resources: ["customresourcedefinitions"]
+  verbs: ["*"]
+---
+kind: ClusterRoleBinding
+apiVersion: rbac.authorization.k8s.io/v1
+metadata:
+  name: fission-cluster-access-{{ .Release.Namespace }}
+subjects:
+- kind: ServiceAccount
+  name: fission-svc
+  namespace: {{ .Release.Namespace }}
+roleRef:
+  kind: ClusterRole
+  name: fission-cluster-access
+  apiGroup: rbac.authorization.k8s.io
+{{- end}}
