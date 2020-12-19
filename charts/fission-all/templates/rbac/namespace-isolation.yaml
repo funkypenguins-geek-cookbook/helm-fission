@@ -8,6 +8,24 @@ rules:
     - "fission.io"
   resources: ["*"]
   verbs: ["*"]
+  # These need to exist for getter to work
+- apiGroups:
+  - '*'
+  resources:
+  - packages
+  verbs:
+  - get
+  - watch
+  - list  
+- apiGroups:
+  - '*'
+  resources:
+  - secrets
+  - configmaps
+  verbs:
+  - get
+  - watch
+  - list    
 ---
 kind: RoleBinding
 apiVersion: rbac.authorization.k8s.io/v1
