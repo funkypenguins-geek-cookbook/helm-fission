@@ -12,7 +12,7 @@ rules:
 kind: RoleBinding
 apiVersion: rbac.authorization.k8s.io/v1
 metadata:
-  name: fission-namespace-admin
+  name: fission-namespace-k8s-admin
   namespace: {{ .Release.Namespace }}
 subjects:
 - kind: ServiceAccount
@@ -21,6 +21,19 @@ roleRef:
   kind: ClusterRole
   name: admin
   apiGroup: rbac.authorization.k8s.io
+---
+kind: RoleBinding
+apiVersion: rbac.authorization.k8s.io/v1
+metadata:
+  name: fission-namespace-admin
+  namespace: {{ .Release.Namespace }}
+subjects:
+- kind: ServiceAccount
+  name: fission-svc
+roleRef:
+  kind: Role
+  name: fission-namespace-admin
+  apiGroup: rbac.authorization.k8s.io  
 ---
 # The fission controller needs to look at the CRDs
 kind: ClusterRole
