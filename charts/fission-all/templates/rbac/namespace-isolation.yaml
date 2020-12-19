@@ -66,6 +66,6 @@ subjects:
   namespace: {{ .Release.Namespace }}
 roleRef:
   kind: ClusterRole
-  name: fission-cluster-access
+  name: fission-cluster-access-{{ .Release.Namespace }}
   apiGroup: rbac.authorization.k8s.io
 {{- end}}
