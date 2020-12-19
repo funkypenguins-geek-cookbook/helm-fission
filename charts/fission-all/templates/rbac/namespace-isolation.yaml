@@ -26,7 +26,7 @@ roleRef:
 kind: ClusterRole
 apiVersion: rbac.authorization.k8s.io/v1beta1
 metadata:
-  name: fission-cluster-access
+  name: fission-cluster-access-{{ .Release.Namespace }}
 rules:
   # any of the fission pods should be able to view custom resources at a cluster-wide scope
 - apiGroups:
