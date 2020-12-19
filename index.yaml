@@ -139,6 +139,36 @@ entries:
     urls:
     - https://github.com/geek-cookbook/helm-fission/releases/download/fission-all-1.8.1-pre4/fission-all-1.8.1-pre4.tgz
     version: 1.8.1-pre4
+  - apiVersion: v2
+    appVersion: 1.11.2
+    created: "2020-12-19T03:22:23.381427643Z"
+    dependencies:
+    - condition: prometheus.enabled
+      name: prometheus
+      repository: https://charts.helm.sh/stable
+      version: 9.3.1
+    description: Fission is a fast serverless framework for Kubernetes.
+    digest: 7ae6ce4e39f08c01fcd589b6362de0801b5e7ff8885fcd003854e0172f677ffe
+    home: http://fission.io/
+    keywords:
+    - fission
+    - serverless
+    maintainers:
+    - email: soamvasani+1@gmail.com
+      name: soamvasani
+      url: https://github.com/soamvasani
+    - email: hello@tachingchen.com
+      name: life1347
+      url: https://github.com/life1347
+    - email: davidy@funkypenguin.co.nz
+      name: funkypenguin
+      url: https://www.funkypenguin.co.nz
+    name: fission-all
+    sources:
+    - https://github.com/fission/fission
+    urls:
+    - https://github.com/geek-cookbook/helm-fission/releases/download/fission-all-1.8.1-pre30/fission-all-1.8.1-pre30.tgz
+    version: 1.8.1-pre30
   - apiVersion: v1
     appVersion: 1.8.0
     created: "2020-05-17T10:12:49.353101785Z"
