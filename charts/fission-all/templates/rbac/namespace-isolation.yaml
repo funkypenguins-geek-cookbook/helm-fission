@@ -46,7 +46,7 @@ rules:
   - "services"
   - "deployments"
   - "secrets"
-  verbs: ["list","watch","delete"] # not ideal, but minimal required to avoid fission services crashing atm
+  verbs: ["list","watch"] # not ideal, but minimal required to avoid fission services crashing atm
 - apiGroups:
     - "fission.io"
   resources: ["*"]
