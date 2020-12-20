@@ -95,13 +95,17 @@ apiVersion: v1
 kind: ServiceAccount
 metadata:
   name: fission-fetcher
+{{- if .Values.namespaceIsolation }}
   namespace: {{ .Values.functionNamespace }}
+{{- end }}
 ---
 apiVersion: v1
 kind: ServiceAccount
 metadata:
   name: fission-builder
+{{- if .Values.namespaceIsolation }}
   namespace: {{ .Values.builderNamespace }}
+{{- end }}
 
 ---
 apiVersion: v1
