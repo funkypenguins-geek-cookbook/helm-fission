@@ -141,6 +141,31 @@ entries:
     version: 1.8.1-pre4
   - apiVersion: v1
     appVersion: 1.11.2
+    created: "2020-12-20T20:37:50.44630129Z"
+    description: Fission is a fast serverless framework for Kubernetes.
+    digest: baa405e6c370ab8b4ae2b0b0ce22a75ad42f67ec434bcfca617525e50466f9fc
+    home: http://fission.io/
+    keywords:
+    - fission
+    - serverless
+    maintainers:
+    - email: soamvasani+1@gmail.com
+      name: soamvasani
+      url: https://github.com/soamvasani
+    - email: hello@tachingchen.com
+      name: life1347
+      url: https://github.com/life1347
+    - email: davidy@funkypenguin.co.nz
+      name: funkypenguin
+      url: https://www.funkypenguin.co.nz
+    name: fission-all
+    sources:
+    - https://github.com/fission/fission
+    urls:
+    - https://github.com/geek-cookbook/helm-fission/releases/download/fission-all-1.8.1-pre36/fission-all-1.8.1-pre36.tgz
+    version: 1.8.1-pre36
+  - apiVersion: v1
+    appVersion: 1.11.2
     created: "2020-12-20T20:12:05.066886742Z"
     description: Fission is a fast serverless framework for Kubernetes.
     digest: 16cdf97b4a6a149525cae9a5166dab5a23559586bac8205a74233ff4e0b9a8c9
