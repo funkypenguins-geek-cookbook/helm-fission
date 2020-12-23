@@ -19,6 +19,10 @@ spec:
       labels:
         svc: storagesvc
         application: fission-storage
+{{- if .Values.storagesvc.annotations }}
+      annotations:
+{{ toYaml .Values.storagesvc.annotations | indent 8 }}  
+{{ end }}         
     spec:
       securityContext:
 {{ toYaml .Values.storagesvc.podSecurityContext | indent 8 }}       

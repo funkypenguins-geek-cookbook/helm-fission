@@ -14,6 +14,10 @@ spec:
     metadata:
       labels:
         svc: timer
+{{- if .Values.timer.annotations }}
+      annotations:
+{{ toYaml .Values.timer.annotations | indent 8 }}  
+{{ end }}         
     spec:
       securityContext:
 {{ toYaml .Values.timer.podSecurityContext | indent 8 }}       

@@ -15,6 +15,10 @@ spec:
     metadata:
       labels:
         svc: influxdb
+{{- if .Values.influxdb.annotations }}
+      annotations:
+{{ toYaml .Values.influxdb.annotations | indent 8 }}  
+{{ end }}         
     spec:
       securityContext:
 {{ toYaml .Values.influxdb.podSecurityContext | indent 8 }}       

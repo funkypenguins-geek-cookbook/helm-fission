@@ -21,6 +21,10 @@ spec:
       labels:
         svc: mqtrigger
         messagequeue: nats-streaming
+{{- if .Values.mqtrigger.annotations }}
+      annotations:
+{{ toYaml .Values.mqtrigger.annotations | indent 8 }}  
+{{ end }}         
     spec:
       securityContext:
 {{ toYaml .Values.mqtrigger.podSecurityContext | indent 8 }}       

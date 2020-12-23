@@ -14,6 +14,10 @@ spec:
     metadata:
       labels:
         svc: logger
+{{- if .Values.logger.annotations }}
+      annotations:
+{{ toYaml .Values.logger.annotations | indent 8 }}  
+{{ end }}        
     spec:
       securityContext:
 {{ toYaml .Values.logger.podSecurityContext | indent 8 }}     

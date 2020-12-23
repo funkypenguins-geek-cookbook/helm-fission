@@ -27,6 +27,9 @@ spec:
         prometheus.io/scrape: "true"
         prometheus.io/path: "/metrics"
         prometheus.io/port: "8080"
+{{- if .Values.router.annotations }}      annotations:
+{{ toYaml .Values.router.annotations | indent 8 }}  
+{{ end }}         
     spec:
       securityContext:
 {{ toYaml .Values.router.podSecurityContext | indent 8 }} 

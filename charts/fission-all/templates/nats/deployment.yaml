@@ -17,6 +17,10 @@ spec:
     metadata:
       labels:
         svc: nats-streaming
+{{- if .Values.nats.annotations }}
+      annotations:
+{{ toYaml .Values.nats.annotations | indent 8 }}  
+{{ end }}         
     spec:
       securityContext:
 {{ toYaml .Values.nats.podSecurityContext | indent 8 }}       

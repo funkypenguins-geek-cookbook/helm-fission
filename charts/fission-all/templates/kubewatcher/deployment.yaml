@@ -14,6 +14,10 @@ spec:
     metadata:
       labels:
         svc: kubewatcher
+{{- if .Values.kubewatcher.annotations }}
+      annotations:
+{{ toYaml .Values.kubewatcher.annotations | indent 8 }}  
+{{ end }}         
     spec:
       securityContext:
 {{ toYaml .Values.kubewatcher.podSecurityContext | indent 8 }}       

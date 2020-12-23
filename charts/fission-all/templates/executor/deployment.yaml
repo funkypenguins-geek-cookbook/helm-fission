@@ -18,6 +18,9 @@ spec:
         prometheus.io/scrape: "true"
         prometheus.io/path: "/metrics"
         prometheus.io/port: "8080"
+{{- if .Values.executor.annotations }}
+{{ toYaml .Values.executor.annotations | indent 8 }}  
+{{ end }}         
     spec:
       securityContext:
 {{ toYaml .Values.executor.podSecurityContext | indent 8 }} 
